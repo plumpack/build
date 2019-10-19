@@ -105,7 +105,7 @@ $@"<Project>
             
             Target("default", DependsOn("build"));
             
-            Target("ci", DependsOn("clean", "update-version", "deploy", "docker-build"));
+            Target("ci", DependsOn("clean", "update-version", "deploy", "docker-build", "docker-publish"));
         }
     }
 }
