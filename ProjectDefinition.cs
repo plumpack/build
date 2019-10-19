@@ -40,7 +40,7 @@ namespace Build.Common
             Target("clean", () =>
             {
                 CleanDirectory(ExpandPath("./output"));
-                RunShell($"dotnet clean {definition.SolutionPath}");
+                RunShell($"dotnet clean {commandBuildArgs} {definition.SolutionPath}");
             });
             
             Target("update-version", () =>
