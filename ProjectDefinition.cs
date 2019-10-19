@@ -30,6 +30,8 @@ namespace Build.Common
 
             var dockerHubUsername = Environment.GetEnvironmentVariable("DOCKERHUB_USERNAME");
             var dockerHubPassword = Environment.GetEnvironmentVariable("DOCKERHUB_PASSWORD");
+            var dockerImage = $"{definition.DockerImageName}:{gitVersion.FullVersion}";
+            var dockerImageLatest = $"{definition.DockerImageName}:latest";
             
             var commandBuildArgs = $"--configuration {options.Config}";
             var commandBuildArgsWithVersion = commandBuildArgs;
@@ -100,7 +102,12 @@ $@"<Project>
                     Environment.Exit(1);
                 }
                 RunShell($"docker login --username {dockerHubUsername} --password {dockerHubPassword}");
-                RunShell($"docker push {definition.DockerImageName}:{gitVersion.FullVersion}");
+                RunShell($"docker push {dockerImage}");
+                if (string.IsNullOrEmpty(gitVersion.PreReleaseTag))
+                {
+                    RunShell($"docker tag {dockerImage} {dockerImageLatest}");
+                    RunShell($"docker push {dockerImageLatest}");
+                }
             });
             
             Target("default", DependsOn("build"));
