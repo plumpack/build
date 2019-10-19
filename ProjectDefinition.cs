@@ -1,3 +1,4 @@
+using System;
 using Microsoft.VisualBasic;
 using static Bullseye.Targets;
 using static Build.Buildary.Shell;
@@ -26,6 +27,9 @@ namespace Build.Common
             
             var gitVersion = GetGitVersion(ExpandPath("./"));
             Info($"Version: {gitVersion.FullVersion}");
+
+            var dockerHubUsername = Environment.GetEnvironmentVariable("DOCKERHUB_USERNAME");
+            var dockerHubPassword = Environment.GetEnvironmentVariable("DOCKERHUB_PASSWORD");
             
             var commandBuildArgs = $"--configuration {options.Config}";
             var commandBuildArgsWithVersion = commandBuildArgs;
@@ -58,7 +62,6 @@ $@"<Project>
 </Project>");
             });
 
-            
             Target("docker-dev", () =>
             {
                 Info("Starting the docker environment for development...");
@@ -81,6 +84,23 @@ $@"<Project>
             Target("docker-build", () =>
             {
                 RunShell($"docker build -t {definition.DockerImageName}:{gitVersion.FullVersion} ./output");
+            });
+            
+            Target("docker-publish", () =>
+            {
+                if (string.IsNullOrEmpty(dockerHubUsername))
+                {
+                    Failure("DOCKERHUB_USERNAME is not set.");
+                    Environment.Exit(1);
+                }
+
+                if (string.IsNullOrEmpty(dockerHubPassword))
+                {
+                    Failure("DOCKERHUB_PASSWORD is not set.");
+                    Environment.Exit(1);
+                }
+                RunShell($"docker login --username {dockerHubUsername} --password {dockerHubPassword}");
+                RunShell($"docker push {definition.DockerImageName}:{gitVersion.FullVersion}");
             });
             
             Target("default", DependsOn("build"));
