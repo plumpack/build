@@ -67,7 +67,7 @@ $@"<Project>
             Target("docker-dev", () =>
             {
                 Info("Starting the docker environment for development...");
-                RunShell("cd dev/docker && docker-compose up -d");
+                RunShell("cd docker/dev && docker-compose up -d");
             });
             
             Target("build", () =>
