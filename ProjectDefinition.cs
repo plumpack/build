@@ -32,6 +32,7 @@ namespace Build.Common
             var dockerHubPassword = Environment.GetEnvironmentVariable("DOCKERHUB_PASSWORD");
             var dockerImage = $"{definition.DockerImageName}:{gitVersion.FullVersion}";
             var dockerImageLatest = $"{definition.DockerImageName}:latest";
+            Info($"Docker image: {dockerImage}");
             
             var commandBuildArgs = $"--configuration {options.Config}";
             var commandBuildArgsWithVersion = commandBuildArgs;
